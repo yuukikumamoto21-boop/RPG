@@ -1,0 +1,17 @@
+[Unit]
+Description=Legend of Astra Backend
+After=network.target
+
+[Service]
+Type=simple
+User=__APP_USER__
+WorkingDirectory=__APP_DIR__/current/backend
+EnvironmentFile=__APP_DIR__/shared/backend.env
+ExecStart=/usr/bin/java -cp __APP_DIR__/current/backend/out com.example.rpg.Application
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

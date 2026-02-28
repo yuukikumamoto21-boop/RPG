@@ -1,0 +1,27 @@
+﻿{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node-terminal",
+      "name": "RPG Backend",
+      "request": "launch",
+      "command": "powershell -ExecutionPolicy Bypass -File \"${workspaceFolder}/scripts/start-backend.ps1\""
+    },
+    {
+      "type": "node-terminal",
+      "name": "RPG Frontend",
+      "request": "launch",
+      "command": "powershell -ExecutionPolicy Bypass -File \"${workspaceFolder}/scripts/start-frontend.ps1\""
+    }
+  ],
+  "compounds": [
+    {
+      "name": "RPGを起動（フロント+バックエンド）",
+      "configurations": [
+        "RPG Backend",
+        "RPG Frontend"
+      ],
+      "stopAll": true
+    }
+  ]
+}

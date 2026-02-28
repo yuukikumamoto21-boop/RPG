@@ -1,0 +1,50 @@
+{
+  // ! JavaのJDKパスを指定
+  "java.jdt.ls.java.home": "C:\\Program Files\\Java\\jdk-21",
+
+  // ! 自動保存したくない場合はコメントアウトする
+  // "files.autoSave": "afterDelay",
+
+  // ファイル設定
+  "files.autoSaveDelay": 100,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+
+  // フォーマット設定
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+
+  // エディタ設定
+  "editor.copyWithSyntaxHighlighting": false,
+  "editor.renderControlCharacters": true,
+  "editor.renderWhitespace": "all",
+  "editor.showFoldingControls": "always",
+  "editor.tabSize": 2,
+  "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?　、。！？「」【】『』（）",
+  "editor.wordWrap": "on",
+  "editor.minimap.maxColumn": 50,
+  "editor.minimap.showSlider": "mouseover",
+
+  // ワークベンチ設定
+  "workbench.iconTheme": "vscode-icons",
+  "vsicons.dontShowNewVersionMessage": true,
+
+  // 各言語、ファイル固有設定
+  "[csv]": {
+    "editor.wordWrap": "off"
+  },
+
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "redhat.telemetry.enabled": false,
+  "java.project.sourcePaths": ["src"],
+  "java.project.outputPath": "bin",
+  "java.project.referencedLibraries": ["lib/**/*.jar"]
+}

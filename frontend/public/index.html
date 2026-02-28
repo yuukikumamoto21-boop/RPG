@@ -1,0 +1,137 @@
+﻿<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Legend of Astra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@700;900&family=Shippori+Mincho+B1:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="favicon.png?v=3" type="image/png" />
+    <link rel="alternate icon" href="favicon.svg?v=3" type="image/svg+xml" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="title-screen" class="screen active">
+        <div class="title-icon">⚔</div>
+        <h1 class="game-title">LEGEND<br />OF ASTRA</h1>
+        <p class="game-subtitle">〜 剣と魔法の伝説 〜</p>
+        <div class="line-divider"></div>
+        <p class="story-text">
+          闇の魔王アルタナが世界を覆う時代。<br />
+          一人の勇者が剣を手に立ち上がった。<br />
+          伝説が、今ここに始まるーー。
+        </p>
+        <div class="line-divider"></div>
+        <button id="beginBtn" class="btn btn-primary">ゲームをはじめる</button>
+      </section>
+
+      <section id="map-screen" class="screen">
+        <h2 class="screen-title">⚔ 世界地図</h2>
+        <div class="map-stats" id="mapStats"></div>
+        <div id="mapGrid" class="map-grid"></div>
+        <section id="recoverPanel" class="recover-panel">
+          <button
+            id="recoverToggleBtn"
+            class="btn btn-action map-wide-btn"
+            type="button"
+          >
+            💖 回復する
+          </button>
+          <div id="recoverContent" class="hidden">
+            <h3 class="panel-title">💖 回復</h3>
+            <p class="command-hint">手持ちアイテムを使ってHP/MPを回復</p>
+            <div id="mapRecoverGrid" class="list-grid"></div>
+          </div>
+        </section>
+        <button id="openShopBtn" class="btn btn-action map-wide-btn">
+          🏪 商店に寄る
+        </button>
+      </section>
+
+      <section id="shop-screen" class="screen">
+        <h2 class="screen-title">🏪 商店 - 旅の備え</h2>
+        <p id="shopGold" class="shop-gold"></p>
+        <div id="shopGrid" class="shop-grid"></div>
+        <button id="closeShopBtn" class="btn btn-action">📍 地図に戻る</button>
+      </section>
+
+      <section id="battle-screen" class="screen">
+        <section class="battle-top">
+          <article id="playerCard" class="panel battler-card">
+            <p class="side-label">🛡 勇者</p>
+            <div class="portrait-wrap">
+              <div id="playerFx" class="fx-layer"></div>
+              <div id="playerSprite" class="sprite player-sprite">🧙</div>
+            </div>
+            <h3 id="playerName" class="char-name">アストラ</h3>
+            <p id="playerLevel" class="char-level">Lv.1</p>
+            <div class="bar-row">
+              <span class="bar-label hp">HP</span>
+              <div class="bar-bg">
+                <div id="playerHpBar" class="bar-fill hp-fill"></div>
+              </div>
+              <span id="playerHpVal" class="bar-val">0/0</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label mp">MP</span>
+              <div class="bar-bg">
+                <div id="playerMpBar" class="bar-fill mp-fill"></div>
+              </div>
+              <span id="playerMpVal" class="bar-val">0/0</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label exp">EXP</span>
+              <div class="bar-bg">
+                <div id="playerExpBar" class="bar-fill exp-fill"></div>
+              </div>
+              <span id="playerExpVal" class="bar-val">0/0</span>
+            </div>
+          </article>
+
+          <div class="vs-badge">VS</div>
+
+          <article id="enemyCard" class="panel battler-card">
+            <p class="side-label">😈 敵</p>
+            <div class="portrait-wrap">
+              <div id="enemyFx" class="fx-layer"></div>
+              <div id="enemySprite" class="sprite enemy-sprite">👾</div>
+            </div>
+            <h3 id="enemyName" class="char-name">-</h3>
+            <p id="enemyLevel" class="char-level">Lv.-</p>
+            <div class="bar-row">
+              <span class="bar-label hp">HP</span>
+              <div class="bar-bg">
+                <div id="enemyHpBar" class="bar-fill hp-fill"></div>
+              </div>
+              <span id="enemyHpVal" class="bar-val">0/0</span>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel log-panel">
+          <h3 class="panel-title">📜 戦闘ログ</h3>
+          <div id="battleLog" class="battle-log"></div>
+        </section>
+
+        <section class="panel command-panel">
+          <h3 class="panel-title">⚔ コマンド</h3>
+          <div id="commandHint" class="command-hint">
+            行動を選択してください
+          </div>
+
+          <div id="mainMenu" class="action-grid"></div>
+          <div id="magicMenu" class="list-grid hidden"></div>
+          <div id="itemMenu" class="list-grid hidden"></div>
+          <div id="battleResultMenu" class="hidden result-menu"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

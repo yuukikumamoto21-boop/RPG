@@ -1,0 +1,9 @@
+﻿# Java build output
+backend/out/
+
+# IDE / editor
+.vscode/*.log
+
+# OS
+Thumbs.db
+.DS_Store
