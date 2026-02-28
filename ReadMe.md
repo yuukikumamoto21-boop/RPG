@@ -2,200 +2,114 @@
 
 ## 概要
 Java（HttpServer）とHTML/CSS/JavaScriptを用いた
-ブラウザ型RPGゲームアプリケーションです。
+ブラウザ型RPG Webアプリケーションです。
 
 フロントエンドとバックエンドを分離設計し、
-セッション管理・CORS制御・本番デプロイ構成まで考慮した
-フルスタック構成で実装しました。
+単一サーバ前提のWeb構成として実装しています。
 
-## 開発目的
-・WebアプリケーションのAPI設計力向上  
-・セッション管理と状態管理の理解  
-・本番環境を想定したデプロイ構成の実装  
+※ 現在の実装は「メモリ内セッション管理」であり、
+プロセス再起動時にセッションは保持されません。
+多台数構成や永続化には未対応です。
+
+---
 
 ## 技術スタック
 - Backend: Java (HttpServer)
 - Frontend: HTML / CSS / JavaScript
-- Build: Maven（任意）
-- Infra: Nginx / systemd / Let's Encrypt
+- Infra想定: Nginx / systemd
 - OS想定: Ubuntu Server
 
-## アーキテクチャ構成
-- フロント静的配信
-- /api/ をバックエンドへリバースプロキシ
-- HttpOnly Cookieによるセッション分離
-- worldTierによる難易度動的上昇設計
+---
 
-## 工夫した点
-- セッションIDごとのゲーム状態分離
-- CORS動的制御
-- 本番環境自動ブートストラップスクリプト作成
-- ヘルスチェックAPI実装（/healthz）
+## セッション設計（現状仕様）
+- HttpOnly Cookie ベースでセッションIDを発行
+- セッションはメモリ内（sessionId → GameService）
+- サーバ再起動時に全セッション消失
+- 単一インスタンス前提（スケールアウト未対応）
+- SESSION_TTL_MINUTES による自動破棄
 
 ---
- 
- # Legend of Astra (Frontend + Java Backend)
 
-フロントエンドは `frontend/public` の静的ファイル、バックエンドは Java (`HttpServer`) です。
+## CORS設計
+環境変数により制御可能：
 
-## 現在の起動構成
+- CORS_ALLOW_ORIGINS
+- CORS_ALLOW_METHODS
+- CORS_ALLOW_HEADERS
+- CORS_ALLOW_CREDENTIALS
 
-VS Code の実行とデバッグから以下を選択します。
+※ 同一オリジン運用であれば CORS_ALLOW_CREDENTIALS=true は必須ではありません。
 
-- `RPGを起動（フロント+バックエンド）`
+---
 
-この構成は以下を同時起動します。
+## 起動方法（ローカル）
 
-- `RPG Frontend` : `http://localhost:5500`
-- `RPG Backend` : `http://localhost:8080`
-
-## 前提
-
+### 前提
 - Java 17 以上
 - （任意）Maven
 
-`mvn` がない場合でも、`scripts/start-backend.ps1` が `javac/java` で起動します。
+### Backend
+scripts/start-backend.ps1 で起動可能。
+
+※ 起動引数で指定可能なのは以下のみ：
+- APP_PORT
+- CORS系設定
+
+SESSION_COOKIE_NAME / SESSION_TTL_MINUTES は
+環境変数からのみ設定可能です。
+
+---
 
 ## API エンドポイント
 
-ベース: `http://localhost:8080/api/game`
+ベース: http://localhost:8080/api/game
 
-- `GET /start` : 新規ゲーム初期化
-- `GET /begin` : タイトルから開始
-- `GET /state` : 現在状態取得
-- `GET|POST /map/enter?node=...` : ノード進入
-- `GET|POST /map/recover?item=...` : 地図画面で回復アイテム使用
-- `GET|POST /shop/open` : 商店を開く
-- `GET|POST /shop/close` : 商店を閉じる
-- `GET|POST /shop/buy?item=...` : アイテム購入
-- `GET|POST /menu?view=main|magic|item` : 戦闘メニュー切替
-- `GET|POST /action?type=attack|magic|item|run&arg=...` : 行動実行
-- `GET|POST /battle/continue` : 戦闘結果後に進行
+GET /start  
+GET /begin  
+GET /state  
+GET|POST /map/enter  
+GET|POST /map/recover  
+GET|POST /shop/open  
+GET|POST /shop/close  
+GET|POST /shop/buy  
+GET|POST /menu  
+GET|POST /action  
+GET|POST /battle/continue  
 
-## 難易度仕様（現在）
+GET /healthz → {"status":"ok"}
 
-- 魔王（`final` ノード）撃破で `worldTier` が 1 上昇
-- `worldTier` 上昇後は、全敵のレベル/HP/ATK/DEF/報酬が強化
-- 強敵は特殊行動を使用
-  - フルカウンター（与ダメの2倍反射）
-  - 溜め攻撃
-  - 連撃
-  - 生命吸収
+---
 
-## 公開時の注意
+## リバースプロキシ構成
 
-- フロントの API ベースは自動判定です。
-  - ローカル(`localhost`)では `:8080` を使用
-  - それ以外は同一オリジンの `/api/game` を使用
-- 明示指定したい場合は以下が使えます。
-  - URL クエリ: `?apiBase=https://example.com/api/game`
-  - `<meta name="api-base" content="https://example.com/api/game">`
+Nginx 設定は2種類あります：
 
-## 環境変数
+- development 用:
+  deployment/nginx/rpg.conf
 
-バックエンドは以下の環境変数に対応しています（`.env.example` 参照）。
+- 本番用:
+  deployment/nginx/rpg.prod.conf.template
 
-- `APP_PORT` : バックエンド待受ポート（既定 `8080`）
-- `CORS_ALLOW_ORIGINS` : 許可オリジン（`,` 区切り、既定 `*`）
-- `CORS_ALLOW_METHODS` : 許可メソッド（既定 `GET,POST,OPTIONS`）
-- `CORS_ALLOW_HEADERS` : 許可ヘッダ（既定 `Content-Type`）
-- `CORS_ALLOW_CREDENTIALS` : `true/false`（既定 `false`）
-- `SESSION_COOKIE_NAME` : セッションCookie名（既定 `RPG_SESSION`）
-- `SESSION_TTL_MINUTES` : セッション有効期限（既定 `120` 分）
+本番環境では **rpg.prod.conf.template を使用します。**
 
-`scripts/start-backend.ps1` からも同等設定を起動引数で指定できます。
+構成:
+- / → フロント静的配信
+- /api/ → バックエンドへプロキシ
+- /healthz → バックエンド転送
 
-## セッション分離（本番向け）
+---
 
-- バックエンドは `HttpOnly` Cookie ベースでセッションIDを発行します。
-- 各セッションIDごとにゲーム状態が分離されるため、ユーザー同士の進行は干渉しません。
-- 一定時間アクセスがないセッションは `SESSION_TTL_MINUTES` に従って破棄されます。
-- 同一オリジン公開（Nginx配下）を前提に、フロント側の追加設定は不要です。
+## 本番公開前提
 
-## ヘルスチェック
+- 単一サーバ構成
+- メモリ内セッション管理
+- 永続化なし
+- URLに到達可能なネットワーク環境で利用可能
 
-- `GET /healthz` : `{"status":"ok"}` を返します。
+---
 
-ロードバランサや監視ではこのエンドポイントを利用してください。
-
-## リバースプロキシ
-
-Nginx のサンプル設定:
-
-- `deployment/nginx/rpg.conf`
-
-この設定では:
-- `/` をフロント静的配信
-- `/api/` をバックエンド（`127.0.0.1:8080`）へプロキシ
-- `/healthz` をバックエンドのヘルスチェックへ転送
-
-## 外部公開手順（本番）
-
-対象: Ubuntu サーバ 1 台 + 独自ドメイン。
-
-### 1. DNS を設定
-
-- `A` レコードで `rpg.example.com` をサーバのグローバルIPへ向ける。
-
-### 2. サーバへプロジェクトを配置
-
-サーバへSSH接続し、任意の作業ディレクトリへこのリポジトリを置きます。
-
-```bash
-git clone <YOUR_REPO_URL>
-cd project-ood-rpg-xxaxxx
-```
-
-### 3. 初回ブートストラップを実行
-
-以下を root で実行します（Nginx/JDK/UFW/systemd/証明書の初期化まで）。
-
-```bash
-chmod +x deployment/prod/*.sh
-sudo DOMAIN=rpg.example.com EMAIL=admin@example.com bash deployment/prod/bootstrap-ubuntu.sh
-```
-
-実行される内容:
-- パッケージ導入（`nginx`, `openjdk-17-jdk`, `certbot` など）
-- `rpg-backend.service` の登録と有効化
-- Nginx サイト設定の配置
-- Let's Encrypt 証明書の取得と HTTPS リダイレクト有効化
-- `backend.env` 初期ファイル作成（`/opt/rpg/shared/backend.env`）
-
-### 4. 本番環境変数を編集
-
-```bash
-sudoedit /opt/rpg/shared/backend.env
-```
-
-最低限以下を本番値に変更:
-- `CORS_ALLOW_ORIGINS=https://rpg.example.com`
-- `CORS_ALLOW_CREDENTIALS=true`
-- `SESSION_TTL_MINUTES=120`（必要に応じ調整）
-
-### 5. アプリをデプロイ
-
-```bash
-sudo REPO_URL=<YOUR_REPO_URL> BRANCH=main bash deployment/prod/deploy-app.sh
-```
-
-### 6. 動作確認
-
-```bash
-curl -i https://rpg.example.com/healthz
-curl -I https://rpg.example.com/
-```
-
-ブラウザで `https://rpg.example.com` を開き、複数ブラウザ/シークレットウィンドウで進行が分離されることを確認します。
-
-### 7. 以後の更新デプロイ
-
-```bash
-sudo REPO_URL=<YOUR_REPO_URL> BRANCH=main bash deployment/prod/deploy-app.sh
-```
-
-### 8. 緊急ロールバック
-
-```bash
-sudo bash deployment/prod/rollback.sh
-```
+## 今後の拡張案
+- Redisによるセッション外部化
+- DB永続化対応
+- 多台数構成対応
+- Docker化
