@@ -1,4 +1,40 @@
-﻿# Legend of Astra (Frontend + Java Backend)
+# Legend of Astra
+
+## 概要
+Java（HttpServer）とHTML/CSS/JavaScriptを用いた
+ブラウザ型RPGゲームアプリケーションです。
+
+フロントエンドとバックエンドを分離設計し、
+セッション管理・CORS制御・本番デプロイ構成まで考慮した
+フルスタック構成で実装しました。
+
+## 開発目的
+・WebアプリケーションのAPI設計力向上  
+・セッション管理と状態管理の理解  
+・本番環境を想定したデプロイ構成の実装  
+
+## 技術スタック
+- Backend: Java (HttpServer)
+- Frontend: HTML / CSS / JavaScript
+- Build: Maven（任意）
+- Infra: Nginx / systemd / Let's Encrypt
+- OS想定: Ubuntu Server
+
+## アーキテクチャ構成
+- フロント静的配信
+- /api/ をバックエンドへリバースプロキシ
+- HttpOnly Cookieによるセッション分離
+- worldTierによる難易度動的上昇設計
+
+## 工夫した点
+- セッションIDごとのゲーム状態分離
+- CORS動的制御
+- 本番環境自動ブートストラップスクリプト作成
+- ヘルスチェックAPI実装（/healthz）
+
+---
+ 
+ # Legend of Astra (Frontend + Java Backend)
 
 フロントエンドは `frontend/public` の静的ファイル、バックエンドは Java (`HttpServer`) です。
 
